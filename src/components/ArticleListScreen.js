@@ -3,9 +3,10 @@ import NavBar from './NavBar';
 
 export default class Article extends Component {
   render(){
+    const { uid, onUserInfoClick} = this.props;
     return (
       <div>
-        <NavBar />
+        <NavBar uid={uid} onUserInfoClick={onUserInfoClick}/>
         article list
       </div>
     )
