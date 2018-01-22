@@ -27,6 +27,7 @@ export default class BBS extends Component {
       if (user) {
         //logged in
         this.getUserInfo(user.uid);
+        this.fetchArticles();
         // this.changeState('list', user.uid);
       } else {
         this.changeState('login');
@@ -39,6 +40,12 @@ export default class BBS extends Component {
     const userNickname = ("nickname" in userInfo.val())?userInfo.val().nickname:userInfo.val().username;
     this.changeState('list');
     this.setState({uid: uid, nickname:userNickname});
+  }
+
+  getNickNameByUserId = async (uid) => {
+    const info = await firebase.database().ref('users/'+uid).once('value');
+    const nickname = info.val().nickname;
+    return nickname;
   }
 
   changeState = (newPage) => {
@@ -59,8 +66,38 @@ export default class BBS extends Component {
     this.changeState('list');
   }
 
+  fetchArticles = async () => {
+    const snapshot = await firebase.database().ref('articles').once('value');
+    const articlesObj = snapshot.val();
+    let articles = null;
+    if(articlesObj != null)
+    {
+      articles = Object.entries(articlesObj).map(([articleId, articleItem]) => {
+        return {
+          ...articleItem,
+          articleId
+        }
+      });
+      const uidSet = new Set(articles.map(({uid}) => uid));
+      const uidObj = {};
+      const ps = Array.from(uidSet).map(async uid => {
+        const snapshot = await firebase.database().ref('users/' + uid).once('value');
+        const nickName = snapshot.val();
+        return [uid, nickName];
+      });
+      const pairArr = await Promise.all(ps);
+      for(const obj of pairArr){
+        uidObj[obj[0]] = obj[1]['nickname'];
+      }
+      articles.forEach(article => {
+        article.author = uidObj[article.uid];
+      });
+    }
+    this.setState({ articles });
+  }
+
   render() {
-    const {nickname, uid} = this.state;
+    const { nickname, uid, articles} = this.state;
     return (
       <div>
         {
@@ -69,6 +106,7 @@ export default class BBS extends Component {
           : this.state.page === 'list'
           ? <Article
             nickname={nickname || uid}
+            articleArr={articles}
             onUserInfoClick={this.changeState}/>
           : this.state.page === 'loading'
           ? <CheckLoginState />

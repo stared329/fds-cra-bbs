@@ -14,6 +14,7 @@ const InnerLeft = styled.div`
   flex-grow: 1;
   font-size: 2em;
   font-weight: 600;
+  align-self: center;
 `
 
 const Btn = styled.button`
