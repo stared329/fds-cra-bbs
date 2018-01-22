@@ -26,7 +26,7 @@ const Btn = styled.button`
   padding: 0.75em 1.5em;
   text-align: center;
 `
-export default class Login extends Component{
+export default class LoginScreen extends Component{
   handleLoginClick = async () => {
     const provider = new firebase.auth.GoogleAuthProvider();
     const result = await firebase.auth().signInWithPopup(provider);

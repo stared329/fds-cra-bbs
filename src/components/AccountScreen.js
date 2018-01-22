@@ -20,7 +20,7 @@ const Btn = styled.button`
   padding: 0.75em 1.5em;
   text-align: center;
 `
-export default class Account extends Component{
+export default class AccountScreen extends Component{
   handleSubmit = e => {
     e.preventDefault();
     const nickName = e.target.elements.nickName.value;

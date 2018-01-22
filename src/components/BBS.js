@@ -1,9 +1,10 @@
 import React, {Component} from 'react';
 import * as firebase from 'firebase';
-import Login from './LoginScreen';
-import Article from './ArticleListScreen';
+import LoginScreen from './LoginScreen';
+import ArticleListScreen from './ArticleListScreen';
 import CheckLoginState from './LoginChecking';
-import Account from './AccountScreen';
+import AccountScreen from './AccountScreen';
+import ArticleScreen from './ArticleScreen';
 
 export default class BBS extends Component {
   state = {
@@ -96,25 +97,47 @@ export default class BBS extends Component {
     this.setState({ articles });
   }
 
+  viewArticle = async (aId) => {
+    console.log(aId);
+    const [articleSnapshot, contentSnapshot] = await Promise.all([
+      firebase.database().ref('articles/' + aId).once('value'),
+      firebase.database().ref('contents/' + aId).once('value')
+    ]);
+    const article = articleSnapshot.val();
+    const content = contentSnapshot.val();
+    this.setState({
+      currentArticle: {
+        ...article,
+        content
+      }
+    });
+    this.changeState('article');
+  }
+
   render() {
-    const { nickname, uid, articles} = this.state;
+    const { nickname, uid, articles, currentArticle } = this.state;
     return (
       <div>
         {
           this.state.page === 'login'
-          ? <Login />
+          ? <LoginScreen />
           : this.state.page === 'list'
-          ? <Article
+          ? <ArticleListScreen
             nickname={nickname || uid}
             articleArr={articles}
-            onUserInfoClick={this.changeState}/>
+            onUserInfoClick={this.changeState}
+            onArticleClick={this.viewArticle}/>
           : this.state.page === 'loading'
           ? <CheckLoginState />
           : this.state.page === 'editinfo'
-          ? <Account
+          ? <AccountScreen
             nickname={nickname || uid}
             onNickNameClick={this.changeState}
             onNickNameSubmit={this.saveNickName}/>
+          : this.state.page === 'article'
+          ? <ArticleScreen {...currentArticle}
+            nickname={nickname || uid}
+            onUserInfoClick={this.changeState}/>
           : null
         }
       </div>

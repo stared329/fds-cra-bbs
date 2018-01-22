@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import NavBar from './NavBar';
 import { Table } from 'semantic-ui-react'
 import styled from 'styled-components';
+import * as moment from 'moment';
+import 'moment/locale/ko';
 
 const ArticleItemRow = styled(Table.Row)`
   &:hover {
@@ -10,9 +12,9 @@ const ArticleItemRow = styled(Table.Row)`
   }
 `;
 
-export default class Article extends Component {
+export default class ArticleListScreen extends Component {
   render(){
-    const { nickname, onUserInfoClick, articleArr } = this.props;
+    const { nickname, onUserInfoClick, articleArr, onArticleClick } = this.props;
     return (
       <div>
         <NavBar nickname={nickname} onUserInfoClick={onUserInfoClick}/>
@@ -28,10 +30,10 @@ export default class Article extends Component {
           <Table.Body>
             {
               articleArr.map(({ articleId, title, author, createdAt }) => (
-                <ArticleItemRow key={articleId}>
+                <ArticleItemRow key={articleId} onClick={e => onArticleClick(articleId)}>
                   <Table.Cell>{author}</Table.Cell>
                   <Table.Cell>{title}</Table.Cell>
-                  <Table.Cell>{createdAt}</Table.Cell>
+                  <Table.Cell>{moment(createdAt).locale('ko').fromNow()}</Table.Cell>
                 </ArticleItemRow>
               ))
             }
