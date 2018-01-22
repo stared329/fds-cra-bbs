@@ -32,7 +32,7 @@ export default class AccountScreen extends Component{
       <div>
         <NavBar nickname={nickname} onUserInfoClick={onNickNameClick} />
         <form onSubmit={this.handleSubmit}>
-          <Input type="text" name="nickName"/>
+          <Input type="text" name="nickName" defaultValue={nickname}/>
           <Btn type="submit">Save</Btn>
         </form>
       </div>
