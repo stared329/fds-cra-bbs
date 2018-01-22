@@ -26,34 +26,57 @@ export default class BBS extends Component {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         //logged in
-        this.changeState('list', user.uid);
+        this.getUserInfo(user.uid);
+        // this.changeState('list', user.uid);
       } else {
         this.changeState('login');
       }
     });
   }
 
-  changeState = (newPage, uid) => {
+  getUserInfo = async (uid) => {
+    const userInfo = await firebase.database().ref('users/'+uid).once('value');
+    const userNickname = ("nickname" in userInfo.val())?userInfo.val().nickname:userInfo.val().username;
+    this.changeState('list');
+    this.setState({uid: uid, nickname:userNickname});
+  }
+
+  changeState = (newPage) => {
     this.setState(prevState => {
       return {
-        page: newPage,
-        uid: uid
+        page: newPage
       };
     });
   }
 
+  saveNickName = async nickname => {
+    await firebase.database().ref('users/'+this.state.uid).update({
+      nickname: nickname
+    });
+    this.setState({
+      nickname: nickname
+    });
+    this.changeState('list');
+  }
+
   render() {
+    const {nickname, uid} = this.state;
     return (
       <div>
         {
           this.state.page === 'login'
           ? <Login />
           : this.state.page === 'list'
-          ? <Article uid={this.state.uid} onUserInfoClick={this.changeState}/>
+          ? <Article
+            nickname={nickname || uid}
+            onUserInfoClick={this.changeState}/>
           : this.state.page === 'loading'
           ? <CheckLoginState />
           : this.state.page === 'editinfo'
-          ? <Account />
+          ? <Account
+            nickname={nickname || uid}
+            onNickNameClick={this.changeState}
+            onNickNameSubmit={this.saveNickName}/>
           : null
         }
       </div>

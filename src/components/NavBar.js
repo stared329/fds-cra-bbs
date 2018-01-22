@@ -35,6 +35,7 @@ const UserInfo = styled.a`
   color: white;
   font-size: 14px;
   align-self: center;
+  padding: 0 20px;
 `
 
 export default class NavBar extends Component{
@@ -49,7 +50,7 @@ export default class NavBar extends Component{
     return (
       <Wrap>
         <InnerLeft>BBS</InnerLeft>
-        <UserInfo onClick={this.handleNickNameClick}>{this.props.uid}</UserInfo>
+        <UserInfo onClick={this.handleNickNameClick}>{this.props.nickname}</UserInfo>
         <Btn onClick={this.handleLogoutClick}>Logout</Btn>
       </Wrap>
     )
